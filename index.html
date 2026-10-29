@@ -26,7 +26,7 @@ body{font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothi
 #sky{position:fixed;inset:0;z-index:0;background:radial-gradient(120% 70% at 50% 0%,#1B2459 0%,#0B1030 45%,#070B1E 100%)}
 #sky i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:tw 3s ease-in-out infinite}
 @keyframes tw{0%,100%{opacity:.25}50%{opacity:1}}
-.app{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:18px 18px 96px;min-height:100vh}
+.app{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:18px 18px 150px;min-height:100vh}
 header{display:flex;justify-content:space-between;align-items:center;padding-top:env(safe-area-inset-top)}
 header b{font-size:23px;font-weight:900;letter-spacing:-.04em}
 header b em{font-style:normal;color:var(--t4)}
@@ -49,16 +49,21 @@ section{display:none}section.on{display:block}
 .charges i.on{background:linear-gradient(180deg,#7FB8FF,#4C9DFF);border-color:transparent;box-shadow:0 0 10px rgba(76,157,255,.6)}
 .chargeTxt{text-align:center;font-size:13px;color:var(--sub);font-weight:700}
 .chargeTxt b{color:var(--txt)}
-.engine{margin-top:20px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:14px;display:grid;grid-template-columns:76px 1fr;gap:14px;align-items:center}
-.engBtn{width:76px;height:76px;border-radius:22px;border:0;background:linear-gradient(180deg,#FF8A5B,#FF5A3C);box-shadow:0 6px 0 #B83A22;display:grid;place-items:center;cursor:pointer}
+.engine{margin-top:20px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:14px;display:grid;grid-template-columns:92px 1fr;gap:16px;align-items:center}
+.engBtn{width:92px;height:92px;border-radius:26px;border:0;background:linear-gradient(180deg,#FF8A5B,#FF5A3C);box-shadow:0 6px 0 #B83A22;display:grid;place-items:center;cursor:pointer}
 .engBtn:active{transform:translateY(4px);box-shadow:0 2px 0 #B83A22}
-.engBtn svg{width:40px;height:40px}
+.engBtn svg{width:50px;height:50px}
 .eng b{font-size:15px;font-weight:900}
 .eng span{display:block;font-size:12px;color:var(--sub);font-weight:700;margin-top:2px}
 .gauge{height:12px;border-radius:999px;background:rgba(255,255,255,.08);margin-top:10px;overflow:hidden}
 .gauge i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#FFC83D,#FF6B4A)}
-.permit{display:none;margin:14px auto 0;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--txt);border-radius:14px;padding:10px 16px;font:inherit;font-size:13px;font-weight:800}
-.permit.on{display:block}
+.corner{position:fixed;right:max(16px,calc(50% - 204px));bottom:104px;z-index:6;display:none;flex-direction:column;gap:8px;align-items:flex-end}
+.corner.on{display:flex}
+.tog{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:rgba(18,24,56,.92);backdrop-filter:blur(10px);color:var(--sub);border-radius:999px;padding:8px 12px 8px 10px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
+.tog i{width:26px;height:16px;border-radius:999px;background:rgba(255,255,255,.12);position:relative;transition:.2s}
+.tog i:after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#8F98C8;transition:.2s}
+.tog.on{color:var(--txt);border-color:rgba(76,157,255,.6)}
+.tog.on i{background:#4C9DFF}.tog.on i:after{left:12px;background:#fff}
 
 /* dex */
 .dexTop{display:flex;justify-content:space-between;align-items:flex-end;margin:20px 2px 12px}
@@ -105,6 +110,13 @@ nav button.on{background:#EEF1FF;color:#0B1030}
 .legend .rcard{box-shadow:0 0 0 6px rgba(255,200,61,.15),0 0 80px rgba(255,200,61,.55)}
 .toast{position:fixed;left:50%;bottom:92px;transform:translate(-50%,40px);opacity:0;background:#EEF1FF;color:#0B1030;padding:11px 16px;border-radius:14px;font-size:13.5px;font-weight:800;transition:.3s;z-index:9;white-space:nowrap}
 .toast.show{transform:translate(-50%,0);opacity:1}
+@media (max-height:760px){
+  .portal{width:190px;height:190px;margin-top:10px}
+  .portal .ring2{inset:16px}
+  .charges{margin-top:12px}
+  .engine{margin-top:12px;grid-template-columns:80px 1fr;padding:12px}
+  .engBtn{width:80px;height:80px;border-radius:22px}
+}
 </style>
 </head>
 <body>
@@ -114,8 +126,7 @@ nav button.on{background:#EEF1FF;color:#0B1030}
 
   <section id="tab-obs" class="on">
     <div class="portal" id="portal"><div class="ring"></div><div class="ring2"></div>
-      <div class="core"><b>흔들어서 관측</b><span>또는 여기를 눌러요</span></div></div>
-    <button class="permit" id="permit">흔들기 켜기</button>
+      <div class="core"><b>흔들어서 관측</b><span id="hint"></span></div></div>
     <div class="charges" id="charges"></div>
     <div class="chargeTxt">관측 가능 <b id="chargeN"></b>회</div>
     <div class="engine">
@@ -136,6 +147,7 @@ nav button.on{background:#EEF1FF;color:#0B1030}
   </section>
 </div>
 
+<div class="corner on" id="corner"><button class="tog" id="touchTog"><i></i>터치 관측</button><button class="tog" id="shakeTog"><i></i>흔들기 켜기</button></div>
 <nav><button data-t="obs" class="on">관측</button><button data-t="dex">도감</button><button data-t="fuse">융합</button></nav>
 <div class="reveal" id="reveal"><div style="text-align:center"><div id="rcard"></div><button class="ok" id="ok">확인</button></div></div>
 <div class="toast" id="toast"></div>
@@ -355,7 +367,19 @@ function observe(){
   const p = document.getElementById('portal'); p.classList.remove('shake'); void p.offsetWidth; p.classList.add('shake');
   setTimeout(()=>gain(randomOf(pickTier())), 380);
 }
-document.getElementById('portal').onclick = observe;
+// 터치 관측: 켜져 있을 때만 화면을 눌러 관측
+let touchOn = false, shakeOn = false;
+document.getElementById('portal').onclick = () => {
+  if (!touchOn){ toast('터치 관측이 꺼져 있어요. 흔들어서 관측해요!'); return; }
+  observe();
+};
+function setToggles(){
+  document.getElementById('touchTog').classList.toggle('on', touchOn);
+  document.getElementById('shakeTog').classList.toggle('on', shakeOn);
+  document.getElementById('shakeTog').lastChild.textContent = shakeOn ? '흔들기 켜짐' : '흔들기 켜기';
+  document.getElementById('hint').textContent = touchOn ? '또는 여기를 눌러요' : (shakeOn ? '폰을 흔들어 보세요' : '오른쪽 아래에서 흔들기를 켜요');
+}
+document.getElementById('touchTog').onclick = () => { touchOn = !touchOn; setToggles(); };
 
 // 흔들기: 가속도 변화가 크면 관측
 let lastShake = 0;
@@ -364,13 +388,17 @@ function onMotion(e){
   const m = Math.sqrt((a.x||0)**2 + (a.y||0)**2 + (a.z||0)**2);
   if (m > 24 && Date.now() - lastShake > 1200){ lastShake = Date.now(); observe(); }
 }
-const permit = document.getElementById('permit');
-if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function'){
-  permit.classList.add('on');   // 아이폰은 버튼으로 허용 받기
-  permit.onclick = async () => { try { if (await DeviceMotionEvent.requestPermission() === 'granted'){ window.addEventListener('devicemotion', onMotion); permit.classList.remove('on'); toast('이제 흔들어서 관측할 수 있어요'); } } catch(e){ toast('허용되지 않았어요'); } };
-} else {
+document.getElementById('shakeTog').onclick = async () => {
+  if (shakeOn){ shakeOn = false; window.removeEventListener('devicemotion', onMotion); setToggles(); return; }
+  // 아이폰은 버튼을 눌렀을 때 권한을 받아야 해요
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function'){
+    try { if (await DeviceMotionEvent.requestPermission() !== 'granted'){ toast('허용되지 않았어요'); return; } }
+    catch(e){ toast('허용되지 않았어요'); return; }
+  }
   window.addEventListener('devicemotion', onMotion);
-}
+  shakeOn = true; setToggles(); toast('이제 흔들어서 관측할 수 있어요');
+};
+setToggles();
 
 // ---------- 로켓 엔진(충전) ----------
 const TAP = 5;          // 한 번 누를 때 오르는 양 (%)
@@ -398,6 +426,7 @@ function fuse(ti){
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on', x===b));
   document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id==='tab-'+b.dataset.t));
+  document.getElementById('corner').classList.toggle('on', b.dataset.t==='obs');
 });
 
 // 배경 별
